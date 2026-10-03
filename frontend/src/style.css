@@ -1102,3 +1102,142 @@ td em {
     flex-direction: column;
   }
 }
+
+/* 配方版本与冲洗排期 */
+.run-stage {
+  display: grid;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.run-stage__title {
+  margin: 0;
+  font-size: 15px;
+  letter-spacing: 0.08em;
+  color: var(--accent-deep);
+}
+
+.row-actions {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin-top: 6px;
+}
+
+tr.draft-row > td {
+  padding: 0;
+  background: #fdf4e3;
+}
+
+.draft-banner {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: center;
+  padding: 12px 16px;
+  border-left: 3px solid var(--accent);
+}
+
+.draft-banner strong {
+  color: var(--accent-deep);
+  font-size: 13px;
+}
+
+.draft-banner small {
+  color: var(--ink-soft);
+  font-size: 11px;
+}
+
+.draft-hints {
+  margin: 6px 0 0;
+  padding-left: 18px;
+  color: var(--danger);
+  font-size: 12px;
+}
+
+.version-list {
+  display: grid;
+  gap: 10px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.version-list li {
+  display: grid;
+  gap: 3px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--paper);
+}
+
+.version-list strong {
+  color: var(--teal);
+}
+
+.version-list small,
+.version-list span {
+  color: var(--ink-soft);
+  font-size: 11px;
+}
+
+.run-card--waiting {
+  border-left: 4px solid #c79a3f;
+}
+
+.run-card--progress {
+  border-left: 4px solid var(--teal);
+}
+
+.run-parameters label {
+  display: grid;
+  gap: 3px;
+  min-width: 170px;
+}
+
+.run-parameters label small {
+  color: var(--ink-soft);
+  font-size: 10px;
+}
+
+.run-parameters select {
+  padding: 6px 8px;
+}
+
+.confirm-strip {
+  display: grid;
+  gap: 3px;
+  padding: 9px 12px;
+  border-radius: 9px;
+  font-size: 12px;
+}
+
+.confirm-strip strong {
+  font-size: 12.5px;
+}
+
+.confirm-strip:not(.confirm-strip--pending) {
+  background: #e9f3ec;
+  color: #2f6b45;
+}
+
+.confirm-strip--pending {
+  background: #fae8e2;
+  color: var(--danger);
+}
+
+.confirm-strip small {
+  color: var(--ink-soft);
+}
+
+.complete-panel {
+  margin-top: 18px;
+  border: 1px solid var(--line-strong);
+}
+
+.orphan-drafts {
+  margin-bottom: 16px;
+  border-left: 4px solid var(--accent);
+}

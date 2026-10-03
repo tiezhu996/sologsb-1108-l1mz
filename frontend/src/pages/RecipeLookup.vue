@@ -8,6 +8,7 @@ import { useDeveloperStore } from '../stores/developerStore'
 import { useFilmStore } from '../stores/filmStore'
 import { useRecipeStore } from '../stores/recipeStore'
 import { useRunStore } from '../stores/runStore'
+import type { DevRecipe } from '../types/dev-recipe'
 
 const filmStore = useFilmStore()
 const developerStore = useDeveloperStore()
@@ -34,10 +35,14 @@ function developerName(id: number): string {
   return developerStore.developers.find((developer) => developer.id === id)?.name ?? '未知显影液'
 }
 
-function recipeName(id: number): string {
-  const recipe = recipeStore.recipes.find((item) => item.id === id)
-  if (!recipe) return '未知配方'
-  return `${filmName(recipe.filmId)} · ${developerName(recipe.developerId)}`
+function recipeOfRun(run: { recipeId: number; recipeVersion: number }): DevRecipe | undefined {
+  return recipeStore.getVersion(run.recipeId, run.recipeVersion)
+}
+
+function recipeName(run: { recipeId: number; recipeVersion: number }): string {
+  const recipe = recipeOfRun(run)
+  if (!recipe) return '未知配方版本'
+  return `${filmName(recipe.filmId)} · ${developerName(recipe.developerId)} · v${run.recipeVersion}`
 }
 
 onMounted(async () => {
@@ -64,16 +69,16 @@ onMounted(async () => {
     <div class="stat-strip">
       <StatBadge label="在册胶片" :value="filmStore.films.length" hint="按乳剂批次独立记录" tone="amber" />
       <StatBadge label="可用显影液" :value="developerStore.activeDevelopers.length" hint="不含已报废工作液" tone="cyan" />
-      <StatBadge label="有效配方" :value="recipeStore.recipes.length" hint="覆盖黑白与彩色流程" />
-      <StatBadge label="冲洗记录" :value="runStore.runs.length" hint="可用于回溯样片结果" tone="rose" />
+      <StatBadge label="有效配方" :value="recipeStore.currentRecipes.length" hint="按当前发布版本计" />
+      <StatBadge label="等待/在冲" :value="runStore.waitingRuns.length + runStore.inProgressRuns.length" :hint="`待确认 ${runStore.unconfirmedCount} 罐`" tone="rose" />
     </div>
 
     <div class="lookup-grid">
       <div class="panel panel--wide">
         <div class="panel__head">
           <div>
-            <h2>时间温度检索</h2>
-            <p>组合胶片、稀释比与推拉档，右侧曲线显示当前温度选择。</p>
+            <h2>时间温度检索（当前发布版）</h2>
+            <p>草稿不在此显示；历史罐次依据旧版配方，请到冲洗记录页按版本号追溯。</p>
           </div>
           <button type="button" class="ghost-button" @click="resetFilters">重置筛选</button>
         </div>
@@ -115,19 +120,21 @@ onMounted(async () => {
                 <th>胶片</th>
                 <th>显影液</th>
                 <th>稀释</th>
+                <th>版本</th>
                 <th>温度</th>
                 <th>显影时间</th>
                 <th>档位</th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="recipe in filteredRecipes" :key="recipe.id" @click="selectedTemp = recipe.tempC">
+              <tr v-for="recipe in filteredRecipes" :key="recipe.recipeId" @click="selectedTemp = recipe.tempC">
                 <td>
                   <strong>{{ filmName(recipe.filmId) }}</strong>
-                  <small>配方 #{{ recipe.id }}</small>
+                  <small>配方组 #{{ recipe.recipeId }}</small>
                 </td>
                 <td>{{ developerName(recipe.developerId) }}</td>
                 <td>{{ recipe.dilution }}</td>
+                <td><strong class="accent-number">v{{ recipe.version }}</strong></td>
                 <td>{{ recipe.tempC }}°C</td>
                 <td>{{ recipe.devMinutes.toFixed(2) }} 分钟</td>
                 <td><PushPullTag :value="recipe.pushPull" /></td>
@@ -149,8 +156,8 @@ onMounted(async () => {
         <div class="panel recent-panel">
           <div class="panel__head">
             <div>
-              <h2>最近冲洗</h2>
-              <p>温度与结果形成下一批次的经验起点。</p>
+              <h2>最近完成罐次</h2>
+              <p>按实冲绑定的配方版本显示，当时依据可追溯。</p>
             </div>
           </div>
           <article v-for="run in runStore.recentRuns" :key="run.id" class="run-brief">
@@ -158,7 +165,7 @@ onMounted(async () => {
               <strong>{{ run.batchNo }}</strong>
               <span>{{ run.runDate }}</span>
             </div>
-            <p>{{ recipeName(run.recipeId) }}</p>
+            <p>{{ recipeName(run) }}</p>
             <div class="run-brief__meta">
               <span>{{ run.actualTempC }}°C</span>
               <span>{{ run.actualMinutes }} 分钟</span>
@@ -171,4 +178,3 @@ onMounted(async () => {
     </div>
   </section>
 </template>
-
