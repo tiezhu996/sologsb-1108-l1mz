@@ -64,7 +64,7 @@ onMounted(async () => {
     <div class="stat-strip">
       <StatBadge label="在册胶片" :value="filmStore.films.length" hint="按乳剂批次独立记录" tone="amber" />
       <StatBadge label="可用显影液" :value="developerStore.activeDevelopers.length" hint="不含已报废工作液" tone="cyan" />
-      <StatBadge label="有效配方" :value="recipeStore.recipes.length" hint="覆盖黑白与彩色流程" />
+      <StatBadge label="有效配方" :value="recipeStore.latestPublishedRecipes.length" hint="仅统计最新发布版本" />
       <StatBadge label="冲洗记录" :value="runStore.runs.length" hint="可用于回溯样片结果" tone="rose" />
     </div>
 
@@ -124,7 +124,7 @@ onMounted(async () => {
               <tr v-for="recipe in filteredRecipes" :key="recipe.id" @click="selectedTemp = recipe.tempC">
                 <td>
                   <strong>{{ filmName(recipe.filmId) }}</strong>
-                  <small>配方 #{{ recipe.id }}</small>
+                  <small>配方 #{{ recipe.groupId ?? recipe.id }} · v{{ recipe.version }}</small>
                 </td>
                 <td>{{ developerName(recipe.developerId) }}</td>
                 <td>{{ recipe.dilution }}</td>
